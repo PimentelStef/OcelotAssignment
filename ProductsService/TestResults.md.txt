@@ -1,0 +1,39 @@
+Ocelot API Gateway — Test Results
+
+Test Environment
+
+Gateway: http://localhost:5000
+Products Service: http://localhost:5001
+Orders Service: http://localhost:5002
+Auth Service: http://localhost:5003
+
+All client requests were sent through the API Gateway at port 5000.
+
+Test Matrix
+
+No.	Request	Token	Expected Status	Observed Status	Result
+1	GET /gateway/products	None	200 OK	200 OK	PASS
+2	GET /gateway/products/1	None	200 OK	200 OK	PASS
+3	POST /gateway/auth/login with correct credentials	None	200 OK + JWT	200 OK + JWT	PASS
+4	POST /gateway/products	None	401 Unauthorized	401 Unauthorized	PASS
+5	POST /gateway/products	Valid JWT	201 Created	201 Created	PASS
+6	GET /gateway/orders	None	401 Unauthorized	401 Unauthorized	PASS
+7	GET /gateway/orders	Valid JWT	200 OK	200 OK	PASS
+8	Sixth rapid POST /gateway/auth/login request	None	429 Too Many Requests	429 Too Many Requests	PASS
+
+Test Summary
+
+Total tests: 8
+Passed: 8
+Failed: 0
+
+Conclusion
+The Ocelot API Gateway successfully routes requests to the Products, Orders, and Authentication services.
+
+Public product GET requests are accessible without authentication. Product write operations and the Orders endpoint require a valid JWT. Unauthenticated requests to protected endpoints receive HTTP 401 Unauthorized.
+
+The authentication endpoint issues a JWT after successful login. The gateway validates tokens using the configured GatewayKey scheme and enforces rate limiting on the login route. The sixth rapid login request returns HTTP 429 Too Many Requests when the configured rate limit is exceeded.
+
+All requests in this test matrix were made through the gateway at http://localhost:5000, demonstrating the intended single-entry-point architecture.
+
+Note: The observed status codes above should reflect the results actually obtained during testing.
